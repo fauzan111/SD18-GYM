@@ -37,14 +37,60 @@ function Steam({ count = 140 }: { count?: number }) {
     return { positions, speeds }
   }, [count])
 
-  useFrame((_, delta) => {
+  /* Scratch objects + reusable state so the pointer-repel loop allocates nothing. */
+  const cursor = useMemo(() => new THREE.Vector3(), [])
+  const dir = useMemo(() => new THREE.Vector3(), [])
+  const moved = useRef(false)
+  const prevPointer = useRef({ x: 0, y: 0 })
+
+  useFrame((state, delta) => {
     const pts = ref.current
     if (!pts) return
+
+    // Only start repelling once the pointer has actually moved, so the column
+    // isn't blown apart from the default (0,0) pointer on first paint.
+    const p = state.pointer
+    if (p.x !== prevPointer.current.x || p.y !== prevPointer.current.y) {
+      moved.current = true
+      prevPointer.current.x = p.x
+      prevPointer.current.y = p.y
+    }
+
+    // Project the pointer onto the steam plane (z≈0 in world), then bring it
+    // into the points' local space so it stays aligned through the Float wobble.
+    let cx = Infinity
+    let cy = Infinity
+    if (moved.current) {
+      cursor.set(p.x, p.y, 0.5).unproject(state.camera)
+      dir.copy(cursor).sub(state.camera.position).normalize()
+      const t = -state.camera.position.z / dir.z
+      cursor.copy(state.camera.position).addScaledVector(dir, t)
+      pts.worldToLocal(cursor)
+      cx = cursor.x
+      cy = cursor.y
+    }
+
+    const R = 1.05 // influence radius
+    const strength = 2.6 // how hard the steam is pushed away
+
     const arr = pts.geometry.attributes.position.array as Float32Array
     for (let i = 0; i < count; i++) {
       arr[i * 3 + 1] += speeds[i] * delta
       // gentle sway
       arr[i * 3 + 0] += Math.sin(arr[i * 3 + 1] * 2 + i) * 0.0015
+
+      // push away from the cursor with a smooth radial falloff
+      const dx = arr[i * 3 + 0] - cx
+      const dy = arr[i * 3 + 1] - cy
+      const d2 = dx * dx + dy * dy
+      if (d2 < R * R) {
+        const d = Math.sqrt(d2) || 1e-4
+        const f = 1 - d / R // 1 at the cursor, 0 at the edge
+        const push = f * f * strength * delta
+        arr[i * 3 + 0] += (dx / d) * push
+        arr[i * 3 + 1] += (dy / d) * push
+      }
+
       if (arr[i * 3 + 1] > 3) {
         arr[i * 3 + 1] = -0.4
         arr[i * 3 + 0] = (Math.random() - 0.5) * 1.4
