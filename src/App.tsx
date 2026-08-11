@@ -359,7 +359,7 @@ export default function App() {
 
           <Reveal className="person-card" from="left">
             <div className="person-photo">
-              <img src="/faizan.jpg" alt={GYM.owner} />
+              <img src={`${import.meta.env.BASE_URL}faizan.jpg`} alt={GYM.owner} loading="lazy" />
             </div>
             <div className="person-body">
               <div className="eyebrow">Your Contact</div>
