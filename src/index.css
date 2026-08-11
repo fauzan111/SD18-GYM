@@ -185,7 +185,7 @@ button { font-family: inherit; cursor: pointer; }
 }
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3; /* keep the copy + buttons above the bottom hero-fade gradient */
   pointer-events: none;
 }
 .hero-content .btn { pointer-events: auto; }
@@ -515,6 +515,7 @@ button { font-family: inherit; cursor: pointer; }
   display: inline-block;
   overflow: hidden;
   padding: 0.12em 0 0.08em; /* headroom for caps + room for descenders while clipping */
+  white-space: nowrap; /* keep a word intact — chars are separate inline-blocks that could otherwise break mid-word */
 }
 .hero h1 .char {
   display: inline-block;
