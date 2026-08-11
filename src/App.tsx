@@ -9,6 +9,7 @@ const Hero3D = lazy(() => import('./components/Hero3D'))
 const FloatingWeights = lazy(() => import('./components/FloatingWeights'))
 const ShaderBackdrop = lazy(() => import('./components/ShaderBackdrop'))
 const EquipmentBackdrop = lazy(() => import('./components/EquipmentBackdrop'))
+const SaunaScene = lazy(() => import('./components/SaunaScene'))
 
 /* ---- Your gym details. Edit here to update the whole site. ---- */
 const GYM = {
@@ -155,12 +156,21 @@ function CreedBand() {
       </Suspense>
       <div className="creed-overlay" />
       <div className="creed-inner">
-        <div className="eyebrow">The SD18 Creed</div>
-        <h2 className="creed-line">
-          <span className="creed-word">Fly</span> <span className="creed-word">towards</span>{' '}
-          <span className="creed-word accent">your</span> <span className="creed-word accent">dream.</span>
-        </h2>
-        <p className="creed-sub">Show up. Lift heavy. Recover well. Repeat — in the heart of Asansol.</p>
+        <div className="creed-copy">
+          <div className="eyebrow">The SD18 Creed</div>
+          <h2 className="creed-line">
+            <span className="creed-word">Fly</span> <span className="creed-word">towards</span>{' '}
+            <span className="creed-word accent">your</span> <span className="creed-word accent">dream.</span>
+          </h2>
+          <p className="creed-sub">Show up. Lift heavy. Recover well. Repeat — in the heart of Asansol.</p>
+          <div className="creed-tag">🔥 Unwind in our sauna &amp; steam bath after every session.</div>
+        </div>
+        <div className="creed-scene" aria-hidden="true">
+          <Suspense fallback={null}>
+            <SaunaScene />
+          </Suspense>
+          <span className="scene-caption">Sauna &amp; Steam Recovery</span>
+        </div>
       </div>
     </section>
   )
@@ -354,7 +364,7 @@ export default function App() {
             <div className="person-body">
               <div className="eyebrow">Your Contact</div>
               <h3>{GYM.owner}</h3>
-              <p className="person-role">Owner · SD18 GYM</p>
+              <p className="person-role">Head Coach · SD18 GYM</p>
               <div className="person-links">
                 <a href={WA_LINK} target="_blank" rel="noreferrer" className="btn btn-primary">
                   💬 WhatsApp
