@@ -102,6 +102,42 @@ const TRIALS: Trial[] = [
   { name: 'PT · 24 Sessions', price: '14,000', unit: 'Personal Training', desc: '24 one-on-one sessions — the fastest path to serious results.' },
 ]
 
+/* Aesthetic torch: a soft warm light that follows the cursor and lights up
+   the dark page. Pointer-driven, rAF-throttled, and skipped for reduced motion. */
+function TorchCursor() {
+  const ref = useRef<HTMLDivElement>(null)
+  const reduced = usePrefersReducedMotion()
+
+  useEffect(() => {
+    if (reduced) return
+    const el = ref.current
+    if (!el) return
+    let raf = 0
+    let x = 0
+    let y = 0
+    const onMove = (e: MouseEvent) => {
+      x = e.clientX
+      y = e.clientY
+      if (!raf) {
+        raf = requestAnimationFrame(() => {
+          el.style.setProperty('--tx', `${x}px`)
+          el.style.setProperty('--ty', `${y}px`)
+          el.classList.add('active')
+          raf = 0
+        })
+      }
+    }
+    window.addEventListener('mousemove', onMove)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [reduced])
+
+  if (reduced) return null
+  return <div className="torch" ref={ref} aria-hidden="true" />
+}
+
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   useEffect(() => {
@@ -185,6 +221,7 @@ function CreedBand() {
 export default function App() {
   return (
     <>
+      <TorchCursor />
       <Navbar />
 
       {/* HERO */}

@@ -197,10 +197,11 @@ button { font-family: inherit; cursor: pointer; }
 .hero h1 .accent { color: var(--red); }
 .hero-tag {
   color: var(--muted);
-  font-size: 1.15rem;
-  max-width: 480px;
-  margin: 24px 0 36px;
-  line-height: 1.55;
+  font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+  max-width: 640px;
+  margin: 28px auto 40px;
+  line-height: 1.6;
+  text-align: center;
 }
 .hero-actions { display: flex; gap: 16px; flex-wrap: wrap; }
 .hero-fade {
@@ -211,6 +212,25 @@ button { font-family: inherit; cursor: pointer; }
   z-index: 2;
   pointer-events: none;
 }
+
+/* Torch cursor — a warm light that follows the pointer and lifts the dark UI.
+   --tx/--ty are updated from JS; screen blend makes it read as light, not paint. */
+.torch {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  mix-blend-mode: screen;
+  background: radial-gradient(
+    240px circle at var(--tx, 50%) var(--ty, 50%),
+    rgba(255, 138, 66, 0.16),
+    rgba(225, 29, 42, 0.09) 42%,
+    transparent 68%
+  );
+}
+.torch.active { opacity: 1; }
 .scroll-hint {
   position: absolute;
   bottom: 32px; left: 50%;
