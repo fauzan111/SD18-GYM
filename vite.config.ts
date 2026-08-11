@@ -1,9 +1,9 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// `base` must match the GitHub repo name so asset URLs resolve at
-// https://<user>.github.io/sd18-gym/
+// `base` must match the GitHub repo name (case-sensitive) so asset URLs resolve at
+// https://fauzan111.github.io/SD18-GYM/
 export default defineConfig({
-  base: '/sd18-gym/',
+  base: '/SD18-GYM/',
   plugins: [react()],
 })
