@@ -1,6 +1,7 @@
 import { useRef, useMemo } from 'react'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
+import { useInView } from '../lib/useInView'
 
 /* ---- Custom GLSL: a slow flowing red/black energy field (fbm noise) ---- */
 const vertexShader = /* glsl */ `
@@ -104,11 +105,17 @@ function Plane() {
   )
 }
 
-/* Fullscreen animated WebGL gradient — used as a section background strip. */
+/* Fullscreen animated WebGL gradient — used as a section background strip.
+   Only mounts the WebGL context while the band is near the viewport. */
 export default function ShaderBackdrop() {
+  const { ref, inView } = useInView<HTMLDivElement>('200px 0px')
   return (
-    <Canvas className="shader-canvas" orthographic camera={{ position: [0, 0, 1], zoom: 1 }} dpr={[1, 2]}>
-      <Plane />
-    </Canvas>
+    <div ref={ref} className="shader-canvas" aria-hidden="true">
+      {inView && (
+        <Canvas orthographic camera={{ position: [0, 0, 1], zoom: 1 }} dpr={[1, 1.5]}>
+          <Plane />
+        </Canvas>
+      )}
+    </div>
   )
 }

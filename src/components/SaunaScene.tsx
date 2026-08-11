@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Environment, Float } from '@react-three/drei'
 import { EffectComposer, Bloom } from '@react-three/postprocessing'
 import * as THREE from 'three'
+import { useInView } from '../lib/useInView'
 
 /* Soft round sprite texture for realistic steam puffs */
 function useSteamTexture() {
@@ -21,7 +22,7 @@ function useSteamTexture() {
 }
 
 /* Rising steam column above the heater */
-function Steam({ count = 220 }: { count?: number }) {
+function Steam({ count = 140 }: { count?: number }) {
   const tex = useSteamTexture()
   const ref = useRef<THREE.Points>(null)
   const { positions, speeds } = useMemo(() => {
@@ -157,24 +158,29 @@ function SaunaRoom() {
   )
 }
 
-/* Right-column 3D sauna/steam vignette for the creed band. */
+/* Right-column 3D sauna/steam vignette for the creed band.
+   Only mounts while near the viewport; capped dpr + lighter bloom for perf. */
 export default function SaunaScene() {
+  const { ref, inView } = useInView<HTMLDivElement>('200px 0px')
   return (
-    <Canvas
-      className="sauna-canvas"
-      camera={{ position: [0, 0.4, 5.2], fov: 42 }}
-      dpr={[1, 1.6]}
-      gl={{ alpha: true, antialias: true }}
-    >
-      <ambientLight intensity={0.35} color="#ffcfa0" />
-      <spotLight position={[3, 5, 4]} angle={0.5} penumbra={1} intensity={1.2} color="#ffe0b0" />
-      <Float speed={1} rotationIntensity={0.15} floatIntensity={0.4}>
-        <SaunaRoom />
-      </Float>
-      <Environment preset="warehouse" />
-      <EffectComposer>
-        <Bloom intensity={0.7} luminanceThreshold={0.35} luminanceSmoothing={0.9} mipmapBlur />
-      </EffectComposer>
-    </Canvas>
+    <div ref={ref} className="sauna-canvas" aria-hidden="true">
+      {inView && (
+        <Canvas
+          camera={{ position: [0, 0.4, 5.2], fov: 42 }}
+          dpr={[1, 1.5]}
+          gl={{ alpha: true, antialias: true }}
+        >
+          <ambientLight intensity={0.35} color="#ffcfa0" />
+          <spotLight position={[3, 5, 4]} angle={0.5} penumbra={1} intensity={1.2} color="#ffe0b0" />
+          <Float speed={1} rotationIntensity={0.15} floatIntensity={0.4}>
+            <SaunaRoom />
+          </Float>
+          <Environment preset="warehouse" />
+          <EffectComposer>
+            <Bloom intensity={0.55} luminanceThreshold={0.4} luminanceSmoothing={0.9} mipmapBlur />
+          </EffectComposer>
+        </Canvas>
+      )}
+    </div>
   )
 }

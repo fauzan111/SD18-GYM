@@ -588,6 +588,7 @@ button { font-family: inherit; cursor: pointer; }
   grid-template-columns: 1.05fr 0.95fr;
   align-items: center;
   gap: 32px;
+  will-change: transform;
 }
 .creed-copy { text-align: left; }
 .creed-line {
@@ -597,7 +598,7 @@ button { font-family: inherit; cursor: pointer; }
   color: #fff;
   -webkit-text-fill-color: #fff; /* override the gradient-clip on generic headings */
 }
-.creed-word { display: inline-block; }
+.creed-word { display: inline-block; will-change: transform, opacity; }
 .creed-word.accent { color: var(--red); -webkit-text-fill-color: var(--red); }
 .creed-sub {
   color: rgba(244,244,245,0.85);

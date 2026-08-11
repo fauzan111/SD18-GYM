@@ -3,6 +3,7 @@ import Marquee from 'react-fast-marquee'
 import Logo from './components/Logo'
 import { Reveal, SplitHeadline, CountUp } from './components/anim'
 import { gsap, useGSAP } from './lib/gsap'
+import { usePrefersReducedMotion } from './lib/useInView'
 
 /* Heavy WebGL scenes are code-split and lazily loaded. */
 const Hero3D = lazy(() => import('./components/Hero3D'))
@@ -127,11 +128,15 @@ function Navbar() {
 /* Pinned + parallax creed band with a custom WebGL shader behind it. */
 function CreedBand() {
   const ref = useRef<HTMLDivElement>(null)
+  const reduced = usePrefersReducedMotion()
 
   useGSAP(
     () => {
       const el = ref.current
       if (!el) return
+      // Respect reduced-motion: skip the pinned scrub timeline entirely (no
+      // pin/scrub layout work), leaving the band as a static, readable panel.
+      if (reduced) return
       const inner = el.querySelector('.creed-inner')
       const words = el.querySelectorAll('.creed-word')
       const tl = gsap.timeline({
@@ -141,12 +146,13 @@ function CreedBand() {
           end: '+=120%',
           pin: true,
           scrub: 1,
+          anticipatePin: 1,
         },
       })
       tl.from(words, { yPercent: 130, opacity: 0, stagger: 0.18, ease: 'none' })
         .to(inner, { scale: 1.12, ease: 'none' }, 0)
     },
-    { scope: ref }
+    { scope: ref, dependencies: [reduced] }
   )
 
   return (
@@ -359,7 +365,14 @@ export default function App() {
 
           <Reveal className="person-card" from="left">
             <div className="person-photo">
-              <img src={`${import.meta.env.BASE_URL}faizan.jpg`} alt={GYM.owner} loading="lazy" />
+              <img
+                src={`${import.meta.env.BASE_URL}faizan.jpg`}
+                alt={GYM.owner}
+                width={800}
+                height={600}
+                loading="lazy"
+                decoding="async"
+              />
             </div>
             <div className="person-body">
               <div className="eyebrow">Your Contact</div>

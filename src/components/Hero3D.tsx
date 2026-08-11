@@ -147,7 +147,7 @@ function EnergyBlob() {
 }
 
 /* Drifting particle field */
-function Particles({ count = 1200 }: { count?: number }) {
+function Particles({ count = 800 }: { count?: number }) {
   const points = useRef<THREE.Points>(null)
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3)
@@ -187,7 +187,7 @@ export default function Hero3D() {
     <Canvas
       className="hero-canvas"
       camera={{ position: [0, 0.5, 8], fov: 42 }}
-      dpr={[1, 2]}
+      dpr={[1, 1.75]}
       gl={{ antialias: true, alpha: true }}
     >
       <color attach="background" args={['#08080a']} />

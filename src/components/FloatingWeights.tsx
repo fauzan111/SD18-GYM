@@ -3,6 +3,7 @@ import { Canvas, useFrame } from '@react-three/fiber'
 import { Float, Environment, MeshDistortMaterial } from '@react-three/drei'
 import * as THREE from 'three'
 import { HexDumbbell, Kettlebell, Barbell, Spin } from './equipment'
+import { useInView } from '../lib/useInView'
 
 const chrome = { color: '#c8c9d0', metalness: 1, roughness: 0.14, envMapIntensity: 1.6 }
 const dark = { color: '#141418', metalness: 0.85, roughness: 0.35 }
@@ -92,16 +93,22 @@ function Rig() {
   )
 }
 
-/* Ambient WebGL layer behind the Membership section. */
+/* Ambient WebGL layer behind the Membership section.
+   Only mounts while near the viewport so it stops rendering off-screen. */
 export default function FloatingWeights() {
+  const { ref, inView } = useInView<HTMLDivElement>('200px 0px')
   return (
-    <Canvas className="weights-canvas" camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 1.6]} gl={{ alpha: true, antialias: true }}>
-      <ambientLight intensity={0.4} />
-      <pointLight position={[-6, 4, 4]} intensity={2} color="#e11d2a" />
-      <pointLight position={[6, -3, 2]} intensity={1.4} color="#ff2b3a" />
-      <spotLight position={[0, 8, 6]} angle={0.4} penumbra={1} intensity={1.6} color="#ffffff" />
-      <Rig />
-      <Environment preset="night" />
-    </Canvas>
+    <div ref={ref} className="weights-canvas" aria-hidden="true">
+      {inView && (
+        <Canvas camera={{ position: [0, 0, 7], fov: 45 }} dpr={[1, 1.5]} gl={{ alpha: true, antialias: true }}>
+          <ambientLight intensity={0.4} />
+          <pointLight position={[-6, 4, 4]} intensity={2} color="#e11d2a" />
+          <pointLight position={[6, -3, 2]} intensity={1.4} color="#ff2b3a" />
+          <spotLight position={[0, 8, 6]} angle={0.4} penumbra={1} intensity={1.6} color="#ffffff" />
+          <Rig />
+          <Environment preset="night" />
+        </Canvas>
+      )}
+    </div>
   )
 }
