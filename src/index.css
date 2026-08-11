@@ -172,11 +172,11 @@ button { font-family: inherit; cursor: pointer; }
 /* Hero */
 .hero {
   position: relative;
-  height: 100vh;
-  min-height: 640px;
+  min-height: max(640px, 100vh);
   display: flex;
   align-items: center;
   overflow: hidden;
+  padding: 96px 0 60px; /* clear the fixed navbar so hero content never slips under it */
 }
 .hero-canvas {
   position: absolute;
