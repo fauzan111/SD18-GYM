@@ -225,16 +225,17 @@ button { font-family: inherit; cursor: pointer; }
 .torch {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 9999;
   pointer-events: none;
-  opacity: 0;
+  opacity: 0.6;
   transition: opacity 0.5s ease;
   mix-blend-mode: screen;
   background: radial-gradient(
-    240px circle at var(--tx, 50%) var(--ty, 50%),
-    rgba(255, 138, 66, 0.16),
-    rgba(225, 29, 42, 0.09) 42%,
-    transparent 68%
+    280px circle at var(--tx, 50%) var(--ty, 50%),
+    rgba(255, 150, 80, 0.35),
+    rgba(255, 90, 50, 0.2) 35%,
+    rgba(225, 29, 42, 0.1) 55%,
+    transparent 72%
   );
 }
 .torch.active { opacity: 1; }

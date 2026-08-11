@@ -103,19 +103,17 @@ const TRIALS: Trial[] = [
 ]
 
 /* Aesthetic torch: a soft warm light that follows the cursor and lights up
-   the dark page. Pointer-driven, rAF-throttled, and skipped for reduced motion. */
+   the dark page. Pointer-driven and rAF-throttled. */
 function TorchCursor() {
   const ref = useRef<HTMLDivElement>(null)
-  const reduced = usePrefersReducedMotion()
 
   useEffect(() => {
-    if (reduced) return
     const el = ref.current
     if (!el) return
     let raf = 0
-    let x = 0
-    let y = 0
-    const onMove = (e: MouseEvent) => {
+    let x = window.innerWidth / 2
+    let y = window.innerHeight / 2
+    const onMove = (e: PointerEvent) => {
       x = e.clientX
       y = e.clientY
       if (!raf) {
@@ -127,14 +125,13 @@ function TorchCursor() {
         })
       }
     }
-    window.addEventListener('mousemove', onMove)
+    window.addEventListener('pointermove', onMove)
     return () => {
-      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('pointermove', onMove)
       if (raf) cancelAnimationFrame(raf)
     }
-  }, [reduced])
+  }, [])
 
-  if (reduced) return null
   return <div className="torch" ref={ref} aria-hidden="true" />
 }
 
