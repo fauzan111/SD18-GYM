@@ -611,3 +611,16 @@ button { font-family: inherit; cursor: pointer; }
 }
 .weights-canvas { width: 100%; height: 100%; }
 .pricing-section > *:not(.pricing-webgl) { position: relative; z-index: 1; }
+
+/* Ambient equipment backdrops behind Facilities / Trials sections */
+.equip-section { position: relative; }
+.equip-canvas {
+  position: absolute;
+  inset: -8% -6%;
+  z-index: 0;
+  opacity: 0.5;
+  pointer-events: none;
+}
+.equip-canvas canvas { width: 100% !important; height: 100% !important; }
+.equip-section > *:not(.equip-canvas) { position: relative; z-index: 1; }
+@media (max-width: 720px) { .equip-canvas { opacity: 0.32; } }

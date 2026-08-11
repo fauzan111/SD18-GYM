@@ -3,6 +3,7 @@ import { Canvas, useFrame, type GroupProps } from '@react-three/fiber'
 import { Float, Environment, Grid, MeshTransmissionMaterial, MeshDistortMaterial } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
+import { HexDumbbell, Kettlebell, Barbell, Spin } from './equipment'
 
 const chrome = { color: '#c8c9d0', metalness: 1, roughness: 0.12, envMapIntensity: 2 }
 const redMetal = {
@@ -13,7 +14,7 @@ const redMetal = {
   emissiveIntensity: 0.9,
 }
 
-/* Metallic dumbbell built from primitives */
+/* Realistic hex dumbbell centerpiece with pointer-reactive spin */
 function Dumbbell(props: GroupProps) {
   const group = useRef<THREE.Group>(null)
 
@@ -26,41 +27,9 @@ function Dumbbell(props: GroupProps) {
     group.current.rotation.z = THREE.MathUtils.lerp(group.current.rotation.z, x * -0.3, 0.05)
   })
 
-  const Plates = ({ dir = 1 }: { dir?: number }) => (
-    <group position={[dir * 1.15, 0, 0]}>
-      <mesh castShadow>
-        <cylinderGeometry args={[0.9, 0.9, 0.35, 64]} />
-        <meshStandardMaterial {...redMetal} />
-      </mesh>
-      <mesh position={[dir * 0.33, 0, 0]}>
-        <cylinderGeometry args={[0.64, 0.64, 0.3, 64]} />
-        <meshStandardMaterial {...chrome} />
-      </mesh>
-      <mesh position={[dir * 0.6, 0, 0]}>
-        <cylinderGeometry args={[0.46, 0.46, 0.28, 64]} />
-        <meshStandardMaterial {...redMetal} />
-      </mesh>
-    </group>
-  )
-
   return (
     <group ref={group} rotation={[0.15, 0, 0]} {...props}>
-      <group rotation={[0, 0, Math.PI / 2]}>
-        <mesh castShadow>
-          <cylinderGeometry args={[0.17, 0.17, 2.4, 48]} />
-          <meshStandardMaterial {...chrome} roughness={0.25} />
-        </mesh>
-      </group>
-      <Plates dir={1} />
-      <Plates dir={-1} />
-      <mesh position={[1.78, 0, 0]}>
-        <sphereGeometry args={[0.22, 32, 32]} />
-        <meshStandardMaterial {...chrome} />
-      </mesh>
-      <mesh position={[-1.78, 0, 0]}>
-        <sphereGeometry args={[0.22, 32, 32]} />
-        <meshStandardMaterial {...chrome} />
-      </mesh>
+      <HexDumbbell />
     </group>
   )
 }
@@ -233,7 +202,7 @@ export default function Hero3D() {
       <GlassOrb />
       <EnergyBlob />
 
-      {/* floating weight plates drifting around the centerpiece */}
+      {/* floating gym equipment drifting around the centerpiece */}
       <Float speed={1.4} rotationIntensity={0.5} floatIntensity={1.2}>
         <WeightPlate position={[-3.4, -1.8, -1]} scale={0.9} speed={1.1} />
       </Float>
@@ -242,6 +211,18 @@ export default function Hero3D() {
       </Float>
       <Float speed={1.2} rotationIntensity={0.4} floatIntensity={1.3}>
         <WeightPlate position={[2.2, -2.4, 0.5]} scale={0.55} speed={0.9} />
+      </Float>
+      {/* kettlebell, top-left */}
+      <Float speed={1.5} rotationIntensity={0.8} floatIntensity={1.4}>
+        <Spin speed={0.4} position={[-4, 1.9, -1.5]} scale={0.9} rotation={[0.3, 0, 0.2]}>
+          <Kettlebell />
+        </Spin>
+      </Float>
+      {/* loaded barbell, drifting low-right, tilted */}
+      <Float speed={1.1} rotationIntensity={0.3} floatIntensity={1}>
+        <Spin speed={0.25} axis="x" position={[3.9, -2.1, -2.5]} scale={0.62} rotation={[0.4, 0.5, 0.3]}>
+          <Barbell />
+        </Spin>
       </Float>
 
       <Float speed={2} rotationIntensity={0.4} floatIntensity={0.9}>

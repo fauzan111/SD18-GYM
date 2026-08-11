@@ -8,6 +8,7 @@ import { gsap, useGSAP } from './lib/gsap'
 const Hero3D = lazy(() => import('./components/Hero3D'))
 const FloatingWeights = lazy(() => import('./components/FloatingWeights'))
 const ShaderBackdrop = lazy(() => import('./components/ShaderBackdrop'))
+const EquipmentBackdrop = lazy(() => import('./components/EquipmentBackdrop'))
 
 /* ---- Your gym details. Edit here to update the whole site. ---- */
 const GYM = {
@@ -223,8 +224,17 @@ export default function App() {
         </Marquee>
       </div>
 
-      {/* FACILITIES */}
-      <section className="section container" id="facilities">
+      {/* FACILITIES — with ambient floating 3D equipment behind it */}
+      <section className="section container equip-section" id="facilities">
+        <Suspense fallback={null}>
+          <EquipmentBackdrop
+            items={[
+              { piece: 'kettlebell', position: [-4.6, 1.6, -1], scale: 0.85, spin: 0.4 },
+              { piece: 'dumbbell', position: [4.4, -1.8, -1.5], scale: 0.7, spin: 0.35 },
+              { piece: 'plate', position: [4.2, 2, -2], scale: 0.7, spin: 0.6 },
+            ]}
+          />
+        </Suspense>
         <Reveal>
           <div className="eyebrow">Everything You Need</div>
           <h2 className="section-title">
@@ -288,8 +298,17 @@ export default function App() {
         </p>
       </section>
 
-      {/* TRIAL & PERSONAL TRAINING */}
-      <section className="section container" id="trials">
+      {/* TRIAL & PERSONAL TRAINING — with ambient floating 3D equipment */}
+      <section className="section container equip-section" id="trials">
+        <Suspense fallback={null}>
+          <EquipmentBackdrop
+            items={[
+              { piece: 'barbell', position: [-4.3, 1.9, -2], scale: 0.5, spin: 0.25 },
+              { piece: 'plate', position: [-4.4, -1.8, -1], scale: 0.6, spin: 0.5 },
+              { piece: 'kettlebell', position: [4.6, -1.4, -1.5], scale: 0.75, spin: 0.45 },
+            ]}
+          />
+        </Suspense>
         <Reveal>
           <div className="eyebrow">Try Us · Train With Us</div>
           <h2 className="section-title">Trials &amp; Personal Training</h2>
