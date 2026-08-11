@@ -192,6 +192,7 @@ button { font-family: inherit; cursor: pointer; }
 .hero h1 {
   font-size: clamp(3rem, 11vw, 8.5rem);
   text-shadow: 0 4px 60px rgba(0,0,0,0.6);
+  margin: 18px 0 0; /* separate the headline from the eyebrow above it */
 }
 .hero h1 .accent { color: var(--red); }
 .hero-tag {
@@ -513,12 +514,17 @@ button { font-family: inherit; cursor: pointer; }
 .hero h1 .line {
   display: inline-block;
   overflow: hidden;
-  padding-bottom: 0.08em; /* room for descenders while overflow-clipping */
+  padding: 0.12em 0 0.08em; /* headroom for caps + room for descenders while clipping */
 }
 .hero h1 .char {
   display: inline-block;
   will-change: transform;
   transform-origin: 50% 100%;
+}
+/* the space between words is its own char span; inline-block collapses a bare
+   space to zero width, so give it an explicit gap */
+.hero h1 .char.space {
+  width: 0.28em;
 }
 .hero h1 .line.accent .char { color: var(--red); }
 

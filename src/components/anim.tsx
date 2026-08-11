@@ -104,7 +104,7 @@ export function SplitHeadline({ lines, className = '' }: SplitHeadlineProps) {
         return (
           <span className={`line ${lineClass}`} key={li}>
             {[...text].map((c, i) => (
-              <span className="char" key={i}>
+              <span className={`char${c === ' ' ? ' space' : ''}`} key={i}>
                 {c === ' ' ? ' ' : c}
               </span>
             ))}
