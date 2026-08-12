@@ -35,16 +35,19 @@ jobs:
         run: npm run build
 
       - name: Setup Pages
+        if: vars.ENABLE_PAGES_DEPLOY == 'true'
         uses: actions/configure-pages@v5
         with:
           enablement: true
 
       - name: Upload artifact
+        if: vars.ENABLE_PAGES_DEPLOY == 'true'
         uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
   deploy:
+    if: vars.ENABLE_PAGES_DEPLOY == 'true'
     needs: build
     runs-on: ubuntu-latest
     environment:
