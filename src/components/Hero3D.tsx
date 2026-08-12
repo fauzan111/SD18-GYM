@@ -1,5 +1,5 @@
-import { useRef, useMemo, type ReactNode } from 'react'
-import { Canvas, useFrame, type GroupProps } from '@react-three/fiber'
+import { useRef, useMemo, useEffect, type ReactNode } from 'react'
+import { Canvas, useFrame, useThree, type GroupProps } from '@react-three/fiber'
 import { Float, Environment, Grid, MeshTransmissionMaterial, MeshDistortMaterial } from '@react-three/drei'
 import { EffectComposer, Bloom, ChromaticAberration, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
@@ -12,6 +12,44 @@ const redMetal = {
   roughness: 0.18,
   emissive: '#e11d2a',
   emissiveIntensity: 0.9,
+}
+
+/* Keeps the wide dumbbell centerpiece fully in frame on any screen.
+   A perspective camera's fov is *vertical*, so on narrow/portrait phones the
+   horizontal view shrinks and clips the ends of the (wide, spinning) dumbbell.
+   As the screen gets narrower we widen the fov — and, once that hits a sane cap,
+   dolly the camera back — so the full ~±2-unit dumbbell always fits. Desktop
+   (wide) aspect ratios keep the original framing untouched. */
+function ResponsiveCamera() {
+  const camera = useThree((s) => s.camera) as THREE.PerspectiveCamera
+  const size = useThree((s) => s.size)
+
+  useEffect(() => {
+    const aspect = size.width / size.height
+    const targetHalfWidth = 2.3 // horizontal half-extent we must keep visible
+    const baseFov = 42
+    const baseDist = 8
+    const maxFov = 60
+
+    // Vertical half-fov tangent needed so the horizontal half-width fits.
+    let tanHalf = targetHalfWidth / (baseDist * aspect)
+    // Never zoom in tighter than the desktop baseline.
+    tanHalf = Math.max(Math.tan(THREE.MathUtils.degToRad(baseFov) / 2), tanHalf)
+    let fov = THREE.MathUtils.radToDeg(Math.atan(tanHalf) * 2)
+    let dist = baseDist
+
+    // Cap the fov to avoid harsh distortion; make up the rest by dollying back.
+    if (fov > maxFov) {
+      fov = maxFov
+      dist = targetHalfWidth / (Math.tan(THREE.MathUtils.degToRad(maxFov) / 2) * aspect)
+    }
+
+    camera.fov = fov
+    camera.position.set(0, 0.5, dist)
+    camera.updateProjectionMatrix()
+  }, [camera, size])
+
+  return null
 }
 
 /* Realistic hex dumbbell centerpiece with pointer-reactive spin */
@@ -190,6 +228,7 @@ export default function Hero3D() {
       dpr={[1, 1.75]}
       gl={{ antialias: true, alpha: true }}
     >
+      <ResponsiveCamera />
       <color attach="background" args={['#08080a']} />
       <fog attach="fog" args={['#08080a', 9, 24]} />
 
