@@ -14,7 +14,15 @@
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
-html { scroll-behavior: smooth; }
+/* NOTE: do NOT use `scroll-behavior: smooth` here. It fights GSAP ScrollTrigger —
+   ScrollTrigger sets the scroll position as it recalculates on load (fonts, images
+   and the lazy WebGL scenes change page height), and the browser then animates each
+   of those corrections, making the page auto-scroll upward on mobile. Smooth scrolling
+   for in-page anchor links is handled in JS (App.tsx) instead. */
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%; /* stop iOS from auto-inflating text and breaking layout */
+}
 
 /* Futuristic animated backdrop: subtle grid + drifting red glow */
 body::before {
@@ -173,6 +181,7 @@ button { font-family: inherit; cursor: pointer; }
 .hero {
   position: relative;
   height: 100vh;
+  height: 100svh; /* small-viewport unit: stays stable as the mobile URL bar shows/hides */
   min-height: 640px;
   display: flex;
   align-items: center;
@@ -593,6 +602,7 @@ button { font-family: inherit; cursor: pointer; }
 .creed {
   position: relative;
   height: 100vh;
+  height: 100svh;
   min-height: 560px;
   display: flex;
   align-items: center;
@@ -707,3 +717,41 @@ button { font-family: inherit; cursor: pointer; }
 .equip-canvas canvas { width: 100% !important; height: 100% !important; }
 .equip-section > *:not(.equip-canvas) { position: relative; z-index: 1; }
 @media (max-width: 720px) { .equip-canvas { opacity: 0.32; } }
+
+/* ============================================================
+   MOBILE / RESPONSIVE POLISH
+   ============================================================ */
+
+/* The torch is a desktop pointer effect — hide it on touch devices where it just
+   sits as a static overlay. */
+@media (hover: none), (pointer: coarse) {
+  .torch { display: none; }
+}
+
+@media (max-width: 720px) {
+  /* Tighten the very large desktop section rhythm so phones don't scroll forever. */
+  .section { padding: 72px 0; }
+  .container { width: 90vw; }
+
+  /* Center the hero copy on phones (headline/eyebrow are left-aligned on desktop). */
+  .hero { padding-top: 84px; }
+  .hero-content { text-align: center; }
+  .hero-tag { margin: 22px auto 32px; }
+  .hero-actions { justify-content: center; }
+  .hero-actions .btn { flex: 1 1 auto; justify-content: center; }
+
+  /* Decorative WebGL backdrops are expensive on phones and add nothing on a small
+     screen — drop them so the page stays smooth and can't overflow sideways. */
+  .pricing-webgl,
+  .equip-canvas { display: none; }
+
+  /* Roomier tap targets + fewer cramped paddings. */
+  .card { padding: 24px; }
+  .price-card { padding: 32px 24px; }
+  .cta-band { padding: 48px 24px; }
+}
+
+@media (max-width: 480px) {
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .footer-bottom { flex-direction: column; align-items: flex-start; }
+}

@@ -172,18 +172,38 @@ function CreedBand() {
       if (reduced) return
       const inner = el.querySelector('.creed-inner')
       const words = el.querySelectorAll('.creed-word')
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: el,
-          start: 'top top',
-          end: '+=120%',
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1,
-        },
+
+      const mm = gsap.matchMedia()
+
+      // Desktop only: full pinned + scrubbed parallax. Pinning is unreliable on
+      // mobile (it re-lays-out and jumps the scroll position as the URL bar and
+      // lazy content change the viewport), so we never pin on small screens.
+      mm.add('(min-width: 861px)', () => {
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: el,
+            start: 'top top',
+            end: '+=120%',
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
+          },
+        })
+        tl.from(words, { yPercent: 130, opacity: 0, stagger: 0.18, ease: 'none' })
+          .to(inner, { scale: 1.12, ease: 'none' }, 0)
       })
-      tl.from(words, { yPercent: 130, opacity: 0, stagger: 0.18, ease: 'none' })
-        .to(inner, { scale: 1.12, ease: 'none' }, 0)
+
+      // Mobile: a lightweight, non-pinned reveal — no scroll hijacking.
+      mm.add('(max-width: 860px)', () => {
+        gsap.from(words, {
+          yPercent: 40,
+          opacity: 0,
+          stagger: 0.12,
+          duration: 0.7,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: el, start: 'top 75%' },
+        })
+      })
     },
     { scope: ref, dependencies: [reduced] }
   )
@@ -216,6 +236,26 @@ function CreedBand() {
 }
 
 export default function App() {
+  // Smooth-scroll for in-page anchor links. This replaces CSS `scroll-behavior:
+  // smooth`, which we removed because it conflicts with GSAP ScrollTrigger and
+  // caused the page to auto-scroll on mobile. Here we only animate scrolling in
+  // response to an actual anchor click — never during ScrollTrigger's own updates.
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      const link = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]')
+      if (!link) return
+      const id = link.getAttribute('href')?.slice(1)
+      if (!id) return
+      const target = document.getElementById(id)
+      if (!target) return
+      e.preventDefault()
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      target.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' })
+    }
+    document.addEventListener('click', onClick)
+    return () => document.removeEventListener('click', onClick)
+  }, [])
+
   return (
     <>
       <TorchCursor />
