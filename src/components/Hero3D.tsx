@@ -26,15 +26,21 @@ function ResponsiveCamera() {
 
   useEffect(() => {
     const aspect = size.width / size.height
-    const targetHalfWidth = 2.3 // horizontal half-extent we must keep visible
     const baseFov = 42
     const baseDist = 8
-    const maxFov = 60
+    const maxFov = 62
+    const minFov = 30
+    // On phones the canvas is its own compact block — frame the dumbbell tightly
+    // so it reads as the centerpiece. On larger screens keep the original wide
+    // composition (with the floating plates/kettlebell around it).
+    const mobile = size.width <= 720
+    const targetHalfWidth = mobile ? 2.4 : 2.3
 
-    // Vertical half-fov tangent needed so the horizontal half-width fits.
+    // Vertical half-fov tangent needed so the target horizontal half-width fits.
     let tanHalf = targetHalfWidth / (baseDist * aspect)
-    // Never zoom in tighter than the desktop baseline.
-    tanHalf = Math.max(Math.tan(THREE.MathUtils.degToRad(baseFov) / 2), tanHalf)
+    // On desktop, never zoom in tighter than the baseline (preserve the design).
+    if (!mobile) tanHalf = Math.max(Math.tan(THREE.MathUtils.degToRad(baseFov) / 2), tanHalf)
+
     let fov = THREE.MathUtils.radToDeg(Math.atan(tanHalf) * 2)
     let dist = baseDist
 
@@ -43,6 +49,7 @@ function ResponsiveCamera() {
       fov = maxFov
       dist = targetHalfWidth / (Math.tan(THREE.MathUtils.degToRad(maxFov) / 2) * aspect)
     }
+    fov = THREE.MathUtils.clamp(fov, minFov, maxFov)
 
     camera.fov = fov
     camera.position.set(0, 0.5, dist)
